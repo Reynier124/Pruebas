@@ -113,20 +113,30 @@ class Board:
             else:
                 return self.validate_word_vertical(word, location, orientation)
     
-    def display_board(self, placed_word=None):
+    def display_board(self, word=None, location=None, orientation=None):
         for row_index, row in enumerate(self.grid):
-            row_str = self.generate_row_string(row, placed_word, row_index)
+            row_str = self.generate_row_string(row, word, location, orientation, row_index)
             print(row_str)
 
-    def generate_row_string(self, row, placed_word, row_index):
+    def generate_row_string(self, row, word, location, orientation, row_index):
         row_str = ""
         for col_index, cell in enumerate(row):
-            if placed_word is not None and (col_index, row_index) in placed_word["positions"]:
-                row_str += self.format_placed_word_cell(cell)
-                self.deactivate_cell(cell)
+            if word is not None and location is not None and orientation is not None:
+                if self.is_placed_word_cell(col_index, row_index, word, location, orientation):
+                    row_str += self.format_placed_word_cell(cell)
+                    self.deactivate_cell(cell)
+                else:
+                    row_str += self.format_active_cell(cell)
             else:
                 row_str += self.format_active_cell(cell)
         return row_str
+
+    def is_placed_word_cell(self, col_index, row_index, word, location, orientation):
+        if orientation == "H":
+            return location[1] == row_index and location[0] <= col_index < location[0] + len(word)
+        elif orientation == "V":
+            return location[0] == col_index and location[1] <= row_index < location[1] + len(word)
+        return False
 
     def format_placed_word_cell(self, cell):
         return f" {cell.letter.letter} "
