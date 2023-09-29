@@ -2,6 +2,8 @@ import unittest
 from game.scrabble import Scrabble
 from game.player import Player
 from game.board import Board
+from game.cell import Cell
+from game.tile import Tile
 
 class TestScrabble(unittest.TestCase):
     def test_scrabble(self):
@@ -43,47 +45,21 @@ class TestScrabble(unittest.TestCase):
         orientation = "H"
         self.assertEqual(game.validate_word(word,location,orientation), True)
     
-    def test_string_to_tile_hola(self):
+    def test_calculate_score_simple(self):
         game = Scrabble(2)
-        list_tiles = game.string_to_tiles("hola")
-        self.assertEqual(list_tiles[0].letter, "H")
-        self.assertEqual(list_tiles[0].value, 4)
-        self.assertEqual(list_tiles[1].letter, "O")
-        self.assertEqual(list_tiles[1].value, 1)
-        self.assertEqual(list_tiles[2].letter, "L")
-        self.assertEqual(list_tiles[2].value, 1)
-        self.assertEqual(list_tiles[3].letter, "A")
-        self.assertEqual(list_tiles[3].value, 1)
-    def test_string_to_tile_facultad(self):
+        word = [Cell(multiplier=1, letter=Tile("C",1))]
+        game.next_turn()
+        self.assertEqual(game.current_player.score, 0)
+        game.calculate_score(word)
+        self.assertEqual(game.current_player.score, 1)
+    def test_calculate_score_complex(self):
         game = Scrabble(2)
-        list_tiles = game.string_to_tiles("facultad")
-        self.assertEqual(list_tiles[0].letter, "F")
-        self.assertEqual(list_tiles[0].value, 4)
-        self.assertEqual(list_tiles[1].letter, "A")
-        self.assertEqual(list_tiles[1].value, 1)
-        self.assertEqual(list_tiles[2].letter, "C")
-        self.assertEqual(list_tiles[2].value, 2)
-        self.assertEqual(list_tiles[3].letter, "U")
-        self.assertEqual(list_tiles[3].value, 1)
-        self.assertEqual(list_tiles[4].letter, "L")
-        self.assertEqual(list_tiles[4].value, 1)
-        self.assertEqual(list_tiles[5].letter, "T")
-        self.assertEqual(list_tiles[5].value, 1)
-        self.assertEqual(list_tiles[6].letter, "A")
-        self.assertEqual(list_tiles[6].value, 1)
-        self.assertEqual(list_tiles[7].letter, "D")
-        self.assertEqual(list_tiles[7].value, 2)
-    def test_string_to_tile_casa(self):
-        game = Scrabble(2)
-        list_tiles = game.string_to_tiles("casa")
-        self.assertEqual(list_tiles[0].letter, "C")
-        self.assertEqual(list_tiles[0].value, 2)
-        self.assertEqual(list_tiles[1].letter, "A")
-        self.assertEqual(list_tiles[1].value, 1)
-        self.assertEqual(list_tiles[2].letter, "S")
-        self.assertEqual(list_tiles[2].value, 1)
-        self.assertEqual(list_tiles[3].letter, "A")
-        self.assertEqual(list_tiles[3].value, 1)
+        word = [Cell(multiplier=1, letter=Tile("C",1))]
+        game.next_turn()
+        self.assertEqual(game.current_player.score, 0)
+        game.current_player.score = 5
+        game.calculate_score(word)
+        self.assertEqual(game.current_player.score, 6)
         
 if __name__ == '__main__':
     unittest.main()

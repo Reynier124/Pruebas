@@ -80,7 +80,37 @@ class TestBoard(unittest.TestCase):
         self.assertEqual(board.grid[12][8].multiplier, 2)
         self.assertEqual(board.grid[14][3].multiplier, 2)
         self.assertEqual(board.grid[14][11].multiplier, 2)
-            
+    
+    def test_put_words_horizontal(self):
+        board = Board()
+        word = "Facultad"
+        location = (5, 4)
+        orientation = "H"
+        board.put_words(word, location, orientation)
+        self.assertEqual(board.grid[5][4].letter.letter, "F")
+        self.assertEqual(board.grid[5][5].letter.letter, "A")
+        self.assertEqual(board.grid[5][6].letter.letter, "C")
+        self.assertEqual(board.grid[5][7].letter.letter, "U")
+        self.assertEqual(board.grid[5][8].letter.letter, "L")
+        self.assertEqual(board.grid[5][9].letter.letter, "T")
+        self.assertEqual(board.grid[5][10].letter.letter, "A")
+        self.assertEqual(board.grid[5][11].letter.letter, "D")
+    
+    def test_put_words_vertical(self):
+        board = Board()
+        word = "Facultad"
+        location = (5, 4)
+        orientation = "V"
+        board.put_words(word, location, orientation)
+        self.assertEqual(board.grid[5][4].letter.letter, "F")
+        self.assertEqual(board.grid[6][4].letter.letter, "A")
+        self.assertEqual(board.grid[7][4].letter.letter, "C")
+        self.assertEqual(board.grid[8][4].letter.letter, "U")
+        self.assertEqual(board.grid[9][4].letter.letter, "L")
+        self.assertEqual(board.grid[10][4].letter.letter, "T")
+        self.assertEqual(board.grid[11][4].letter.letter, "A")
+        self.assertEqual(board.grid[12][4].letter.letter, "D")
+
     def test_word_inside_board_horizontal(self):
         board = Board()
         word = "Facultad"
@@ -272,57 +302,4 @@ class TestBoard(unittest.TestCase):
 
         word_is_valid = board.validate_word_place_board(word, location, orientation)
         assert word_is_valid == False
-
-class TestCalculateWordValue(unittest.TestCase):
-    def test_simple(self):
-        board = Board()
-        word = [
-            Cell(letter=Tile('C',1)),
-            Cell(letter=Tile('A',1)),
-            Cell(letter=Tile('S',2)),
-            Cell(letter=Tile('A',1))
-        ]
-        value = board.calculate_word_value(word)
-        self.assertEqual(value,5)
-
-    def test_with_letter_multiplayer(self):
-        board = Board()
-        word = [
-            Cell(letter=Tile('C',1)),
-            Cell(letter=Tile('A',1)),
-            Cell(letter=Tile('S',2), multiplier=2, multiplier_type='letter'),
-            Cell(letter=Tile('A',1))
-        ]
-        value = board.calculate_word_value(word)
-        self.assertEqual(value,7)
-    def test_with_word_multiplayer(self):
-        board = Board()
-        word = [
-            Cell(letter=Tile('C',1)),
-            Cell(letter=Tile('A',1)),
-            Cell(letter=Tile('S',2), multiplier=2, multiplier_type='word'),
-            Cell(letter=Tile('A',1))
-        ]
-        value = board.calculate_word_value(word)
-        self.assertEqual(value,10)
-    def test_with_word_and_letter_multiplayer(self):
-        board = Board()
-        word = [
-            Cell(letter=Tile('C',1), multiplier=3, multiplier_type='letter'),
-            Cell(letter=Tile('A',1)),
-            Cell(letter=Tile('S',2), multiplier=2, multiplier_type='word'),
-            Cell(letter=Tile('A',1))
-        ]
-        value = board.calculate_word_value(word)
-        self.assertEqual(value,14)
-    def test_with_word_and_letter_multiplayer_no_active(self):
-        board = Board()
-        word = [
-            Cell(letter=Tile('C',1), multiplier=3, multiplier_type='letter', status='desactive'),
-            Cell(letter=Tile('A',1)),
-            Cell(letter=Tile('S',2), multiplier=2, multiplier_type='word', status='desactive'),
-            Cell(letter=Tile('A',1))
-        ]
-        value = board.calculate_word_value(word)
-        self.assertEqual(value,5)
         

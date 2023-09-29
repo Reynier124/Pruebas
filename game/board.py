@@ -1,4 +1,6 @@
 from game.cell import Cell
+from game.miscellaneous import Miscellaneous
+from colorama import Fore, Style
 
 class Board:
     def __init__(self):
@@ -33,33 +35,22 @@ class Board:
             return Cell(multiplier=multiplier_value, multiplier_type="word")
         elif multiplier_type == "L":
             return Cell(multiplier=multiplier_value, multiplier_type="letter")
-
-    def is_active_and_letter_multiplier(self,cell):
-        return cell.status == 'active' and cell.multiplier_type == 'letter'
-
-    def is_active_and_word_multiplier(self,cell):
-        return cell.status == 'active' and cell.multiplier_type == 'word'
     
-    def is_desactive_or_none_multiplier(self,cell):
-        return cell.status == 'desactive' or cell.multiplier_type == ''
+    def put_words(self, word, location, orientation):
+        misc = Miscellaneous()
+        list_word = misc.converter_word_to_tiles(word)
+        column = location[0]
+        row = location[1]
+        i = 0
+        for _ in list_word:
+            self.grid[column][row].letter = list_word[i]
+            if orientation == "H":
+                row += 1
+                i += 1
+            elif orientation == "V":
+                column += 1
+                i += 1
 
-
-    def calculate_word_value(self,word):
-        total_value = 0
-        word_multiplier = 1
-
-        for cell in word:
-            if self.is_desactive_or_none_multiplier(cell):
-                total_value += cell.letter.value
-            elif self.is_active_and_letter_multiplier(cell):
-                total_value += cell.calculate_value()
-            elif self.is_active_and_word_multiplier(cell):
-                total_value += cell.calculate_value()
-                word_multiplier *= cell.multiplier
-        total_value *= word_multiplier
-
-        return total_value
-    
     def validate_word_inside_board(self,word, location, orientation):
         column = location[0]
         row = location[1]
@@ -83,19 +74,11 @@ class Board:
         else:
             return False
 
-    def compare_tiles_and_letters(self, tile, word):
-        if tile is not None:
-            if tile.letter.lower() == word:
-                return 1
-            else:
-                return 0
-        else:
-            return
-
     def check_right_letters(self, tile, letter, list):
-        if self.compare_tiles_and_letters(tile, letter) == 0:
+        misc = Miscellaneous()
+        if misc.compare_tiles_and_letters(tile, letter) == 0:
             list[0] = 0
-        elif self.compare_tiles_and_letters(tile, letter) == 1:
+        elif misc.compare_tiles_and_letters(tile, letter) == 1:
             if list[0] == -1:
                 list[0] = 1
             list.append(1)
@@ -129,3 +112,47 @@ class Board:
                 return self.validate_word_horizontal(word, location, orientation)
             else:
                 return self.validate_word_vertical(word, location, orientation)
+    
+    def display_board(self, placed_word=None):
+        for row_index, row in enumerate(self.grid):
+            row_str = ""
+            for col_index, cell in enumerate(row):
+                if placed_word is not None and (col_index, row_index) in placed_word["positions"]:
+                    row_str += f" {cell.letter.letter} "
+                    self.deactivate_cell(cell) 
+                else:
+                    if cell.status == 'active':
+                        row_str += self.format_cell_contents(cell)
+                    else:
+                        row_str += "###"
+            print(row_str)
+
+    def format_cell_contents(self, cell):
+        if cell.letter is None:
+            if cell.multiplier_type == 'word':
+                return self.format_word_multiplier(cell.multiplier)
+            elif cell.multiplier_type == 'letter':
+                return self.format_letter_multiplier(cell.multiplier)
+            else:
+                return " - "
+        else:
+            return f" {cell.letter.letter} "
+
+    def format_word_multiplier(self, multiplier):
+        if multiplier == 3:
+            return f"{Fore.RED}{multiplier}W{Style.RESET_ALL} "
+        elif multiplier == 2:
+            return f"{Fore.LIGHTMAGENTA_EX}{multiplier}W{Style.RESET_ALL} "
+        else:
+            return f"{multiplier}W "
+
+    def format_letter_multiplier(self, multiplier):
+        if multiplier == 3:
+            return f"{Fore.BLUE}{multiplier}L{Style.RESET_ALL} "
+        elif multiplier == 2:
+            return f"{Fore.CYAN}{multiplier}L{Style.RESET_ALL} "
+        else:
+            return f"{multiplier}L "
+
+    def deactivate_cell(self, cell):
+        cell.status = 'desactive'
