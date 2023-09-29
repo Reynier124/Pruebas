@@ -5,6 +5,7 @@ from game.bagtiles import BagTiles
 class Player:
     def __init__(self):
         self.rack = []
+        self.score = 0
 
     def get_tiles(self,amount,bag=BagTiles):
         for _ in range(amount):

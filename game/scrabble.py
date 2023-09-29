@@ -1,6 +1,7 @@
 from game.board import Board
 from game.player import Player
 from game.bagtiles import BagTiles
+from game.miscellaneous import Miscellaneous
 import uuid
 
 class Scrabble:
@@ -30,12 +31,7 @@ class Scrabble:
     def validate_word(self, word, location, orientation):
         return self.board.validate_word_inside_board(word,location, orientation)
     
-    def string_to_tiles(self, input_string):
-        bag = BagTiles()
-        tiles_list = []
-        for letter in input_string.upper():
-            for tile in bag.tiles:
-                if tile.letter == letter:
-                    tiles_list.append(tile)
-                    break  
-        return tiles_list
+    def calculate_score(self, word):
+        misc = Miscellaneous()
+        score = misc.calculate_word_value(word)
+        self.current_player.score += score
