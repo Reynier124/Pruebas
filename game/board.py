@@ -115,44 +115,43 @@ class Board:
     
     def display_board(self, placed_word=None):
         for row_index, row in enumerate(self.grid):
-            row_str = ""
-            for col_index, cell in enumerate(row):
-                if placed_word is not None and (col_index, row_index) in placed_word["positions"]:
-                    row_str += f" {cell.letter.letter} "
-                    self.deactivate_cell(cell) 
-                else:
-                    if cell.status == 'active':
-                        row_str += self.format_cell_contents(cell)
-                    else:
-                        row_str += "###"
+            row_str = self.generate_row_string(row, placed_word, row_index)
             print(row_str)
+
+    def generate_row_string(self, row, placed_word, row_index):
+        row_str = ""
+        for col_index, cell in enumerate(row):
+            if placed_word is not None and (col_index, row_index) in placed_word["positions"]:
+                row_str += self.format_placed_word_cell(cell)
+                self.deactivate_cell(cell)
+            else:
+                row_str += self.format_active_cell(cell)
+        return row_str
+
+    def format_placed_word_cell(self, cell):
+        return f" {cell.letter.letter} "
+
+    def format_active_cell(self, cell):
+        if cell.status == 'active':
+            return self.format_cell_contents(cell)
+        else:
+            return "###"
 
     def format_cell_contents(self, cell):
         if cell.letter is None:
-            if cell.multiplier_type == 'word':
-                return self.format_word_multiplier(cell.multiplier)
-            elif cell.multiplier_type == 'letter':
-                return self.format_letter_multiplier(cell.multiplier)
-            else:
-                return " - "
+            return self.format_multiplier(cell.multiplier, cell.multiplier_type)
         else:
             return f" {cell.letter.letter} "
 
-    def format_word_multiplier(self, multiplier):
-        if multiplier == 3:
-            return f"{Fore.RED}{multiplier}W{Style.RESET_ALL} "
-        elif multiplier == 2:
-            return f"{Fore.LIGHTMAGENTA_EX}{multiplier}W{Style.RESET_ALL} "
+    def format_multiplier(self, multiplier, multiplier_type):
+        if multiplier_type == 'word':
+            colors = {2: Fore.LIGHTMAGENTA_EX, 3: Fore.RED}
+        elif multiplier_type == 'letter':
+            colors = {2: Fore.CYAN, 3: Fore.BLUE}
         else:
-            return f"{multiplier}W "
+            return " - "
 
-    def format_letter_multiplier(self, multiplier):
-        if multiplier == 3:
-            return f"{Fore.BLUE}{multiplier}L{Style.RESET_ALL} "
-        elif multiplier == 2:
-            return f"{Fore.CYAN}{multiplier}L{Style.RESET_ALL} "
-        else:
-            return f"{multiplier}L "
+        return f"{colors.get(multiplier, '')}{multiplier}{multiplier_type[0].upper()}{Style.RESET_ALL} "
 
     def deactivate_cell(self, cell):
         cell.status = 'desactive'
